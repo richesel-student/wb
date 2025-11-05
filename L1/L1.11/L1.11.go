@@ -27,6 +27,7 @@ func (m myset) init() myset {
 func (m myset) union() myset {
 	for key, _ := range m.A {
 		if m.A[key] == m.B[key] {
+
 			m.res[key] = true
 		}
 	}
@@ -34,7 +35,6 @@ func (m myset) union() myset {
 	return m
 
 }
-
 
 func main() {
 	set := myset{}
