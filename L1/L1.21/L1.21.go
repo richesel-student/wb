@@ -1,48 +1,91 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func strbyte(s string) []byte {
-	strbyte := []byte(s)
-	return strbyte
-
+type Human struct {
+	name   string
+	age    int
+	gender bool
 }
-func reverse(b []byte, start int, end int) {
-	for start < end {
-		b[start], b[end] = b[end], b[start]
-		start++
-		end--
-	}
-
+type monkey struct {
+	name   string
+	age    int
+	gender int
 }
 
-func reverseWords(b []byte) []byte {
-	start := 0 // начало текущего слова
+type Person interface {
+	PersonInfo() string
+}
 
-	for i := 0; i <= len(b); i++ {
+type AdapterMonkey struct {
+	m *monkey
+}
 
-		if i == len(b) || b[i] == ' ' {
-			left := start
-			right := i - 1
-
-			reverse(b, left, right)
-			start = i + 1
-		}
+func (a AdapterMonkey) PersonInfo() string {
+	if a.m == nil {
+		return ""
 	}
 
-	return b
+	h := Human{
+		name:   a.m.name,
+		age:    a.m.age,
+		gender: a.m.gender != 0,
+	}
+	return h.PersonInfo() // делегирование через адаптацию
+}
+
+func (m monkey) Genderint() string {
+	var Gender string
+
+	if m.gender == 1 {
+		Gender = "мужского"
+	} else {
+		Gender = "женского"
+	}
+	return Gender
+}
+
+func (H Human) Genderstr() string {
+	var Gender string
+
+	if H.gender {
+		Gender = "мужского"
+	} else {
+		Gender = "женского"
+	}
+	return Gender
+}
+
+func (H Human) AgeHuman() string {
+	var agestr string
+	ageint := H.age % 10
+
+	switch ageint {
+	case 1, 2, 3, 4:
+		agestr = "года"
+	case 11, 12, 13, 14:
+		agestr = "лет"
+	case 5, 6, 7, 8, 9, 0:
+		agestr = "лет"
+
+	}
+	return agestr
+}
+
+func (H Human) PersonInfo() string {
+
+	return fmt.Sprintf("Меня зовут %s. Я %s пола. Мне %d %s.", H.name, H.Genderstr(), H.age, H.AgeHuman())
+
+}
+
+func Print(p Person) {
+	fmt.Println(p.PersonInfo())
 }
 
 func main() {
-	strings := "snow dog sun"
-	byteS := strbyte(strings)
-	start := 0
-	end := len(byteS) - 1
-	reverse(byteS, start, end)
-	result := reverseWords(byteS)
-	fmt.Println(string(result))
+
+	monkey := &monkey{"Кинг-конг", 100, 1}
+	Print(AdapterMonkey{m: monkey})
 
 }
 
