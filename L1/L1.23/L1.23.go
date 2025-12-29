@@ -1,32 +1,54 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"math/big"
 )
 
-func DeleteIndex(arr []int, index int) ([]int, error) {
+type Value struct {
+	A *big.Int
+	B *big.Int
+}
 
-	if index < 0 || index >= len(arr) {
-		return arr, fmt.Errorf("Нет элемента в списке")
+func (v *Value) Add() *big.Int {
+
+	return new(big.Int).Add(v.A, v.B)
+}
+
+func (v *Value) Sub() *big.Int {
+
+	return new(big.Int).Sub(v.A, v.B)
+}
+
+func (v *Value) Mul() *big.Int {
+
+	return new(big.Int).Mul(v.A, v.B)
+
+}
+
+func (v *Value) Div() (*big.Int, error) {
+
+	if len(v.B.Bits()) == 0 {
+		return nil, errors.New("Деление на ноль")
+
 	}
-	copy(arr[index:], arr[index+1:])
-	arr = arr[:len(arr)-1]
-	return arr, nil
+
+	return new(big.Int).Div(v.A, v.B), nil
 
 }
 
 func main() {
-	arrInt := make([]int, 0, 99)
+	numbers := Value{A: big.NewInt(1 << 27), B: big.NewInt(1 << 27)}
+	fmt.Printf("\nСумма двух чисел:%v", numbers.Add())
+	fmt.Printf("\nРазность двух чисел:%v", numbers.Sub())
+	fmt.Printf("\nУмножение двух чисел:%v", numbers.Mul())
 
-	for i := 1; i < 100; i++ {
-
-		arrInt = append(arrInt, i)
-
-	}
-	del, err := DeleteIndex(arrInt, 1)
-
+	res, err := numbers.Div()
 	if err != nil {
-		fmt.Print("Ошибка:", err)
+		fmt.Print("\nОшибка:", err)
+	} else {
+		fmt.Println("\nДеление двух чисел:", res)
+
 	}
-	fmt.Print(del)
 }
