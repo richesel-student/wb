@@ -1,0 +1,17 @@
+Hello world
+hello world
+HELLO WORLD
+
+The quick brown fox jumps over the lazy dog
+the Quick Brown fox jumps over the Lazy Dog
+
+apple
+Apple
+pineapple
+green apple
+apple pie
+
+cat
+cats
+concatenate
+Cat
