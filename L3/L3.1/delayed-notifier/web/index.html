@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delayed Notifier</title>
+</head>
+<body>
+
+<h2>📨 Create Notification</h2>
+
+<input id="message" placeholder="message"><br><br>
+<input id="channel" placeholder="channel (email / telegram)"><br><br>
+<input id="to" placeholder="recipient"><br><br>
+
+<button onclick="send()">Send</button>
+
+<hr>
+
+<h2>🔍 Check Status</h2>
+
+<input id="id" placeholder="notification id">
+<button onclick="getStatus()">Check</button>
+
+<p id="result"></p>
+
+<script>
+function send() {
+  fetch("http://localhost:8080/notify", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      message: document.getElementById("message").value,
+      channel: document.getElementById("channel").value,
+      to: document.getElementById("to").value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("✅ Created ID: " + data.id)
+  })
+}
+
+function getStatus() {
+  const id = document.getElementById("id").value
+
+  fetch("http://localhost:8080/notify/" + id)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").innerText = JSON.stringify(data)
+    })
+}
+</script>
+
+</body>
+</html>
