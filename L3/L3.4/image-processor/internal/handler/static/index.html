@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Image Processor</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    img { display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Upload</h2>
+
+<input type="file" id="file">
+<button onclick="upload()">Upload</button>
+
+<h2>Images</h2>
+<div id="list"></div>
+
+<script>
+async function upload() {
+  const file = document.getElementById("file").files[0]
+  if (!file) return
+
+  const fd = new FormData()
+  fd.append("file", file)
+
+  await fetch("/upload", {
+    method: "POST",
+    body: fd
+  })
+}
+
+async function load() {
+  const res = await fetch("/images")
+  const data = await res.json()
+
+  const list = document.getElementById("list")
+  list.innerHTML = ""
+
+  data.forEach(img => {
+    const div = document.createElement("div")
+    div.className = "card"
+
+    let content = `
+      <b>ID:</b> ${img.id}<br/>
+      <b>Status:</b> ${img.status}
+    `
+
+    if (img.status === "DONE") {
+      content += `
+        <img src="${img.processed}" width="300"/>
+        <img src="${img.thumbnail}" width="150"/>
+      `
+    }
+
+    content += `<br/><button onclick="del('${img.id}')">Delete</button>`
+
+    div.innerHTML = content
+    list.appendChild(div)
+  })
+}
+
+async function del(id) {
+  await fetch("/image/" + id, { method: "DELETE" })
+}
+
+setInterval(load, 3000)
+load()
+</script>
+
+</body>
+</html>
