@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Crypto Analytics</title>
+
+  <!-- ✅ Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body { font-family: Arial; background:#f5f5f5; padding:20px; }
+    .card { background:white; padding:20px; border-radius:10px; margin-bottom:20px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:10px; border-bottom:1px solid #ddd; text-align:center; }
+    button { padding:10px; margin:5px; cursor:pointer; }
+  </style>
+</head>
+
+<body>
+
+<h1>📊 Crypto Analytics</h1>
+
+<div class="card">
+  <h2>➕ Новая сделка</h2>
+
+  <select id="asset">
+    <option value="BTC">BTC</option>
+    <option value="ETH">ETH</option>
+  </select>
+
+  <select id="type">
+    <option value="buy">BUY</option>
+    <option value="sell">SELL</option>
+  </select>
+
+  <input type="number" id="amount" placeholder="USD" />
+
+  <button onclick="create()">Добавить</button>
+</div>
+
+<div class="card">
+  <h2>📅 Фильтр</h2>
+  <input type="date" id="from">
+  <input type="date" id="to">
+  <button onclick="loadItems()">Применить</button>
+</div>
+
+<div class="card">
+  <h2>📋 Сделки</h2>
+  <button onclick="loadItems()">Обновить</button>
+  <button onclick="exportCSV()">📥 CSV</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Asset</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th>Fee</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>📈 Аналитика</h2>
+  <button onclick="loadAnalytics()">Загрузить</button>
+  <div id="analytics"></div>
+</div>
+
+<!-- ✅ ГРАФИК -->
+<div class="card">
+  <h2>📊 График</h2>
+  <button onclick="loadChart()">Обновить график</button>
+  <canvas id="chart"></canvas>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
