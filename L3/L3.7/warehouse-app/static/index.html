@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Warehouse</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+button {
+  margin: 2px;
+  padding: 5px 10px;
+}
+
+#modal {
+  position: fixed;
+  top: 20%;
+  left: 30%;
+  width: 40%;
+  background: white;
+  border: 1px solid black;
+  padding: 15px;
+  display: none;
+}
+
+#modal button {
+  float: right;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Login</h2>
+
+<select id="user">
+  <option value="admin">admin</option>
+  <option value="manager">manager</option>
+  <option value="viewer">viewer</option>
+</select>
+
+<button onclick="login()">Login</button>
+
+<hr>
+
+<div id="app" style="display:none">
+
+  <h2>Items</h2>
+
+  <button id="addBtn" onclick="createItem()">Add Item</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+
+</div>
+
+<!-- МОДАЛКА -->
+<div id="modal">
+  <button onclick="closeModal()">X</button>
+  <h3>History</h3>
+  <div id="modalContent"></div>
+</div>
+
+<script>
+
+let token = ""
+let role = ""
+
+function login() {
+  const user = document.getElementById("user").value
+
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ username: user, password: user })
+  })
+  .then(r => r.json())
+  .then(d => {
+    token = d.token
+    role = user
+
+    document.getElementById("app").style.display = "block"
+
+    // скрываем кнопку add для viewer
+    if (role === "viewer") {
+      document.getElementById("addBtn").style.display = "none"
+    }
+
+    loadItems()
+  })
+}
+
+function loadItems() {
+  fetch("/api/items", {
+    headers: { Authorization: "Bearer " + token }
+  })
+  .then(r => r.json())
+  .then(data => {
+    let html = ""
+
+    data.forEach(i => {
+      html += `<tr>
+        <td>${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.quantity}</td>
+        <td>
+          <button onclick="showHistory(${i.id})">History</button>
+          
+          ${role !== "viewer" ? `<button onclick="updateItem(${i.id})">Edit</button>` : ""}
+          ${role === "admin" ? `<button onclick="deleteItem(${i.id})">Delete</button>` : ""}
+        </td>
+      </tr>`
+    })
+
+    document.getElementById("table").innerHTML = html
+  })
+}
+
+function createItem() {
+  const name = prompt("Name:")
+  const quantity = prompt("Quantity:")
+
+  fetch("/api/items", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, quantity: Number(quantity) })
+  }).then(loadItems)
+}
+
+function updateItem(id) {
+  const name = prompt("New name:")
+  const quantity = prompt("New quantity:")
+
+  fetch(`/api/items/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, quantity: Number(quantity) })
+  }).then(loadItems)
+}
+
+function deleteItem(id) {
+  if (!confirm("Delete item?")) return
+
+  fetch(`/api/items/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  }).then(loadItems)
+}
+
+function showHistory(id) {
+  fetch(`/api/items/${id}/history`, {
+    headers: { Authorization: "Bearer " + token }
+  })
+  .then(r => r.json())
+  .then(data => {
+    let html = ""
+
+    data.forEach(h => {
+      html += `<div>
+        <b>${h.action}</b> — user ${h.user} — ${h.time}
+      </div>`
+    })
+
+    document.getElementById("modalContent").innerHTML = html
+    document.getElementById("modal").style.display = "block"
+  })
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none"
+}
+
+</script>
+
+</body>
+</html>
