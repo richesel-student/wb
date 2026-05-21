@@ -1,0 +1,14 @@
+# Binary files
+gc-monitor
+
+# Development files
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
